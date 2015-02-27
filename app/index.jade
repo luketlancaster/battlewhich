@@ -1,40 +1,39 @@
 doctype html
 html(lang='en-US')
-<<<<<<< HEAD
-	head
-		meta(charset='utf-8')
-		meta(http-equiv='X-UA-Compatible', content='IE=edge')
-		meta(name='viewport', content='width=device-width, initial-scale=1')
-		title My Title
-		link(rel='stylesheet', href='css/main.css')
-	body
-			<!--[if lt IE 9]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  head
+    meta(charset='utf-8')
+    meta(http-equiv='X-UA-Compatible', content='IE=edge')
+    meta(name='viewport', content='width=device-width, initial-scale=1')
+    title My Title
+    link(rel='stylesheet', href='css/main.css')
+  body
+      <!--[if lt IE 9]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
 
-		.container
-			.row
-				.col-lg-
-					h1 BattleWich!!!
-			.row
-				.col-md-6.col-md-offset-3
-					form(action='#' id="loginForm")
-						input#userEmail.btn.btn-default(type='text' placeholder='enter email')
-						input#userPassword.btn.btn-default(type='text' placeholder='enter password')
-						input#loginButton.btn.btn-success(type='button' value='login')
-						input#registerButton.btn.btn-primary(type='button' value='register')
-			.row
-				.col-md-4.col-md-offset-4
-					form.logout.out
-						input#logoutButton.btn.btn-danger(type='button' value='logout')
+    .container
+      .row
+        .col-lg-
+          h1 BattleWich!!!
+      .row
+        .col-md-6.col-md-offset-3
+          form(action='#' id="loginForm")
+            input#userEmail.btn.btn-default(type='text' placeholder='enter email')
+            input#userPassword.btn.btn-default(type='text' placeholder='enter password')
+            input#loginButton.btn.btn-success.myBttnG(type='button' value='login')
+            input#registerButton.btn.btn-primary.myBttnB(type='button' value='register')
+      .row
+        .col-md-4.col-md-offset-4
+          form.logout.out
+            input#logoutButton.btn.btn-danger.myBttnR(type='button' value='logout')
 
-			.mainContent
-				table#boardWrapper
+    .table-responsive
+      table#boardWrapper.table-bordered
 
 
-			// build:js js/vendor.min.js
-			// bower:js
-			// endbower
-			// endbuild
+      // build:js js/vendor.min.js
+      // bower:js
+      // endbower
+      // endbuild
 
-			// build:js js/main.min.js
-			script(src="/scripts/index.js")
-			// endbuild
+      // build:js js/main.min.js
+      script(src="/scripts/index.js")
+      // endbuild

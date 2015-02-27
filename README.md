@@ -1,2 +1,2 @@
-# battlewhich
+# BattleWhich
 Battle of the Sandwhiches!!!

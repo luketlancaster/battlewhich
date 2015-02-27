@@ -1,0 +1,21 @@
+@import '../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap';
+
+* {
+  text-align: center;
+}
+
+#boardWrapper {
+  margin: 200px;
+  background-color: purple;
+}
+
+tbody,
+tr,
+td {
+	padding: 10vmin;
+  border: ridge;
+}
+
+img {
+  width: 200px;
+}

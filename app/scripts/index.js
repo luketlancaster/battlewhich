@@ -1,38 +1,26 @@
 'use strict';
 
 var fb = new Firebase('https://battlewhich.firebaseio.com'),
-    gameBoard = [ ['s','','','','','','','','',''],
-                ['s','','','','','','','','',''],
-                ['','','','','','','','','',''],
-                ['','','','','','','','','',''],
-                ['','','','','','','','','',''],
-                ['','','','','','','','','',''],
-                ['','','','','','','','','',''],
-                ['','','','','','','','','',''],
-                ['','','','','','','','','',''],
-                ['','','','','','','','s','s','s'] ],
-   guessBoard = [ ['h','','','','','','','','',''],
-                ['h','','','','','','','','',''],
-                ['','','','','','','','','',''],
-                ['','','','','','','','','',''],
-                ['','','','','m','','','','',''],
-                ['','','','','','','m','','',''],
-                ['','','','','','','','','',''],
-                ['','','','','','','','','',''],
-                ['','','','','','','','','m',''],
-                ['','','','','','','m','h','',''] ],
-  player1 = 'h',
-  player2 = 'm',
-  currPlayer = player1,
+    gameBoard = [],
+   guessBoard = [],
   //TODO: add function that toggles isPlayer1 to true or false depending on whether the player is the first or second to join the game
   playerId,
-  gameId;
+  gameId,
+  boardCounter = 1;
+
 
 $(document).ready(function(){
-  setNewGame();
-  renderBoard(gameBoard);
+  clearBoard(gameBoard)
+  clearBoard(guessBoard)
+//  setNewGame();
+  renderBoard(gameBoard, boardCounter);
+  renderBoard(guessBoard, boardCounter);
 });
 
+function clearBoard(boardToClear){
+  boardToClear.splice(0, boardToClear.length);
+  for(var i = 0; boardToClear.length < 10; i++) {boardToClear.unshift([0,0,0,0,0,0,0,0,0,0])}
+}
 
 
 function setNewGame() {
@@ -56,9 +44,10 @@ function setNewGame() {
 
 //Create board
 
-function renderBoard(data) {
-  $('table').empty();
+function renderBoard(data, i) {
+  $('#table' + i).empty();
   var $tbody = $('<tbody></tbody>');
+
 
   data.forEach(function(row) {
     var $tr = $('<tr></tr>');
@@ -67,13 +56,18 @@ function renderBoard(data) {
     });
     $tbody.append($tr);
   });
-  $('table').append($tbody);
+  $('#table' + i).append($tbody);
+
+  if (boardCounter === 2) {
+    boardCounter = 1;
+  }
+  boardCounter++
 }
 
 
 //Click to select move
 
-$('#boardWrapper').on('click', 'tbody tr td', function(){
+$('.boardWrapper').on('click', 'tbody tr td', function(){
   var row = this.parentElement.sectionRowIndex,
       col = this.cellIndex;
   if (gameBoard[row][col] === '') {
@@ -108,7 +102,7 @@ function gameOverCheck () {
   var compactArr = _(gameBoard).flatten().compact().value();
   if (_.difference(compactArr, ['m']).length === 4) {
     alert('You sunk my BS');
-    _.fill(gameBoard, ['','','','','','','','','',''] , [start=0], [end=gameBoard.length]);
+    _.fill(gameBoard, [0,0,0,0,0,0,0,0,0,0] , [start=0], [end=gameBoard.length]);
     setNewGame();
     renderBoard(gameBoard);
   }

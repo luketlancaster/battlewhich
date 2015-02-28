@@ -6,7 +6,9 @@ var fb = new Firebase('https://battlewhich.firebaseio.com'),
   //TODO: add function that toggles isPlayer1 to true or false depending on whether the player is the first or second to join the game
   playerId,
   gameId,
-  boardCounter = 1;
+  boardCounter = 1,
+  row,
+  col;
 
 
 $(document).ready(function(){
@@ -73,7 +75,7 @@ function renderBoards(board1, board2) {
 //Click to set peices
 
 $('.gameWrapper').on('click', 'tbody tr td', function(){
-  var row = this.parentElement.sectionRowIndex,
+      row = this.parentElement.sectionRowIndex,
       col = this.cellIndex;
   if (gameBoard[row][col] === 0) {
     gameBoard[row][col] += 2;
@@ -86,7 +88,7 @@ $('.gameWrapper').on('click', 'tbody tr td', function(){
 //click to guess
 
 $('.guessWrapper').on('click', 'tbody tr td', function(){
-  var row = this.parentElement.sectionRowIndex,
+      row = this.parentElement.sectionRowIndex,
       col = this.cellIndex;
   if (gameBoard[row][col] === '') {
     gameBoard[row][col] = currPlayer;

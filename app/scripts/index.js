@@ -1,7 +1,8 @@
 'use strict';
 
 var fb = new Firebase('https://battlewhich.firebaseio.com'),
-    gameArr = [ ['','','','','','','','','',''],
+    gameBoard = [ ['s','','','','','','','','',''],
+                ['s','','','','','','','','',''],
                 ['','','','','','','','','',''],
                 ['','','','','','','','','',''],
                 ['','','','','','','','','',''],
@@ -9,8 +10,17 @@ var fb = new Firebase('https://battlewhich.firebaseio.com'),
                 ['','','','','','','','','',''],
                 ['','','','','','','','','',''],
                 ['','','','','','','','','',''],
+                ['','','','','','','','s','s','s'] ],
+   guessBoard = [ ['h','','','','','','','','',''],
+                ['h','','','','','','','','',''],
                 ['','','','','','','','','',''],
-                ['','','','','','','','','',''] ],
+                ['','','','','','','','','',''],
+                ['','','','','m','','','','',''],
+                ['','','','','','','m','','',''],
+                ['','','','','','','','','',''],
+                ['','','','','','','','','',''],
+                ['','','','','','','','','m',''],
+                ['','','','','','','m','h','',''] ],
   player1 = 'h',
   player2 = 'm',
   currPlayer = player1,
@@ -20,7 +30,7 @@ var fb = new Firebase('https://battlewhich.firebaseio.com'),
 
 $(document).ready(function(){
   setNewGame();
-  renderBoard(gameArr);
+  renderBoard(gameBoard);
 });
 
 
@@ -31,7 +41,7 @@ function setNewGame() {
     isTurn: true
   };
   var gameObj = {
-    boardState: gameArr,
+    boardState: gameBoard,
     winner: '',
     loser: '',
     player1: '',
@@ -66,17 +76,17 @@ function renderBoard(data) {
 $('#boardWrapper').on('click', 'tbody tr td', function(){
   var row = this.parentElement.sectionRowIndex,
       col = this.cellIndex;
-  if (gameArr[row][col] === '') {
-    gameArr[row][col] = currPlayer;
+  if (gameBoard[row][col] === '') {
+    gameBoard[row][col] = currPlayer;
     sendBoardState();
-    if(checkForWin(gameArr) === true) {
+    if(checkForWin(gameBoard) === true) {
       alert('Hooray!!! ' + currPlayer + ' wins!!!');
-      _.fill(gameArr, ['','','','','','','','','',''] , [start=0], [end=gameArr.length]);
+      _.fill(gameBoard, ['','','','','','','','','',''] , [start=0], [end=gameBoard.length]);
       setNewGame();
-      renderBoard(gameArr);
+      renderBoard(gameBoard);
     };
     playerTurn();
-    renderBoard(gameArr);
+    renderBoard(gameBoard);
     gameOverCheck();
   } else {
     alert('That space is taken please choose another:)');
@@ -88,19 +98,19 @@ $('#boardWrapper').on('click', 'tbody tr td', function(){
 function sendBoardState() {
 
   fb.child('games/' + gameId).update({
-      boardState: gameArr
+      boardState: gameBoard
   });
 }
 
 
 //switch between players and increment turn counter.
 function gameOverCheck () {
-  var compactArr = _(gameArr).flatten().compact().value();
+  var compactArr = _(gameBoard).flatten().compact().value();
   if (_.difference(compactArr, ['m']).length === 4) {
     alert('You sunk my BS');
-    _.fill(gameArr, ['','','','','','','','','',''] , [start=0], [end=gameArr.length]);
+    _.fill(gameBoard, ['','','','','','','','','',''] , [start=0], [end=gameBoard.length]);
     setNewGame();
-    renderBoard(gameArr);
+    renderBoard(gameBoard);
   }
 }
 

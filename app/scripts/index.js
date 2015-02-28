@@ -13,8 +13,7 @@ $(document).ready(function(){
   clearBoard(gameBoard)
   clearBoard(guessBoard)
 //  setNewGame();
-  renderBoard(gameBoard, boardCounter);
-  renderBoard(guessBoard, boardCounter);
+  renderBoards(gameBoard, guessBoard);
 });
 
 function clearBoard(boardToClear){
@@ -44,30 +43,49 @@ function setNewGame() {
 
 //Create board
 
-function renderBoard(data, i) {
-  $('#table' + i).empty();
+function renderBoards(board1, board2) {
+  $('#table1,#table2').empty();
   var $tbody = $('<tbody></tbody>');
+  var $tbody2 = $('<tbody></tbody>');
 
-
-  data.forEach(function(row) {
+//create game board
+  board1.forEach(function(row) {
     var $tr = $('<tr></tr>');
     row.forEach(function(cell) {
       $tr.append($('<td>' + cell + '</td>'));
     });
     $tbody.append($tr);
   });
-  $('#table' + i).append($tbody);
+  $('#table1').append($tbody);
 
-  if (boardCounter === 2) {
-    boardCounter = 1;
-  }
-  boardCounter++
+//create guess board
+  board2.forEach(function(row) {
+    var $tr = $('<tr></tr>');
+    row.forEach(function(cell) {
+      $tr.append($('<td>' + cell + '</td>'));
+    });
+    $tbody2.append($tr);
+  });
+  $('#table2').append($tbody2);
 }
 
 
-//Click to select move
+//Click to set peices
 
-$('.boardWrapper').on('click', 'tbody tr td', function(){
+$('.gameWrapper').on('click', 'tbody tr td', function(){
+  var row = this.parentElement.sectionRowIndex,
+      col = this.cellIndex;
+  if (gameBoard[row][col] === 0) {
+    gameBoard[row][col] += 2;
+    renderBoards(gameBoard, guessBoard);
+  } else {
+    alert('That space is taken please choose another:)');
+  }
+});
+
+//click to guess
+
+$('.guessWrapper').on('click', 'tbody tr td', function(){
   var row = this.parentElement.sectionRowIndex,
       col = this.cellIndex;
   if (gameBoard[row][col] === '') {

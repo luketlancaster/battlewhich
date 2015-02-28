@@ -10,12 +10,17 @@ html(lang='en-US')
       <!--[if lt IE 9]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
 
     .container
-      h1 BattleWich!!!
+      .row
+        h1 BattleWich!!!
 
-      .table-responsive
-        table#table1.boardWrapper.table-bordered
+        .col-md-6
+          h1 Game Board
+          table#table1.boardWrapper.table-bordered
 
-        table#table2.boardWrapper.table-bordered
+
+        .col-md-6
+          h1 Guess Board
+          table#table2.boardWrapper.table-bordered
 
 
       // build:js js/vendor.min.js

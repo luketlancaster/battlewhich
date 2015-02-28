@@ -1,13 +1,20 @@
 'use strict';
 
 var fb = new Firebase('https://battlewhich.firebaseio.com'),
-  gameArr = [['','',''],['','',''],['','','']],
-  turnCounter = 0,
-  player1 = '/images/tack.jpg',
-  player2 = '/images/tick.jpg',
+    gameArr = [ ['','','','','','','','','',''],
+                ['','','','','','','','','',''],
+                ['','','','','','','','','',''],
+                ['','','','','','','','','',''],
+                ['','','','','','','','','',''],
+                ['','','','','','','','','',''],
+                ['','','','','','','','','',''],
+                ['','','','','','','','','',''],
+                ['','','','','','','','','',''],
+                ['','','','','','','','','',''] ],
+  player1 = 'h',
+  player2 = 'm',
   currPlayer = player1,
   //TODO: add function that toggles isPlayer1 to true or false depending on whether the player is the first or second to join the game
-  cellImg,
   playerId,
   gameId;
 
@@ -45,9 +52,9 @@ function renderBoard(data) {
 
   data.forEach(function(row) {
     var $tr = $('<tr></tr>');
-   row.forEach(function(cell) {
-    $tr.append($('<td><img src="' + cell + '"></img></td>'));
-  });
+    row.forEach(function(cell) {
+      $tr.append($('<td>' + cell + '</td>'));
+    });
     $tbody.append($tr);
   });
   $('table').append($tbody);
@@ -61,11 +68,12 @@ $('#boardWrapper').on('click', 'tbody tr td', function(){
       col = this.cellIndex;
   if (gameArr[row][col] === '') {
     gameArr[row][col] = currPlayer;
-    cellImg = gameArr[row][col];
-
     sendBoardState();
     if(checkForWin(gameArr) === true) {
       alert('Hooray!!! ' + currPlayer + ' wins!!!');
+      _.fill(gameArr, ['','','','','','','','','',''] , [start=0], [end=gameArr.length]);
+      setNewGame();
+      renderBoard(gameArr);
     };
     playerTurn();
     renderBoard(gameArr);
@@ -87,15 +95,15 @@ function sendBoardState() {
 
 //switch between players and increment turn counter.
 function gameOverCheck () {
-  if (turnCounter < 8) {
-    turnCounter++
-  }
-  else {
-    alert('SORRY THIS IS A CAT\'S GAME OVER!');
+  var compactArr = _(gameArr).flatten().compact().value();
+  if (_.difference(compactArr, ['m']).length === 4) {
+    alert('You sunk my BS');
+    _.fill(gameArr, ['','','','','','','','','',''] , [start=0], [end=gameArr.length]);
     setNewGame();
     renderBoard(gameArr);
   }
 }
+
 
 
 
@@ -114,6 +122,7 @@ function gameOverCheck () {
 //     winner: playerId
 //   });
 // }
+
 
 function checkForWin (data) {
   switch(true) {
@@ -147,7 +156,6 @@ function checkForWin (data) {
 //alternates between player turns
 
 function playerTurn () {
-
   if (currPlayer === player1) {
     currPlayer = player2;
     return player1;

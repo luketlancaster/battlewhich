@@ -71,6 +71,16 @@ function renderBoards(board1, board2) {
   $('#table2').append($tbody2);
 }
 
+//click to set peices to vertical or horizontal
+
+$('button.setPeice').on('click', function () {
+  if ($('#setHorizontal')) {
+  console.log('you selected horizontal')
+  } else if ($('#setVertical')) {
+  console.log('you selected vertical')
+  }
+})
+
 
 //Click to set peices
 
@@ -79,11 +89,18 @@ $('.gameWrapper').on('click', 'tbody tr td', function(){
       col = this.cellIndex;
   if (gameBoard[row][col] === 0) {
     gameBoard[row][col] += 2;
+    setPeice();
     renderBoards(gameBoard, guessBoard);
   } else {
     alert('That space is taken please choose another:)');
   }
 });
+
+function gameBoard(row, col) {
+  //this function will insert
+
+
+}
 
 //click to guess
 

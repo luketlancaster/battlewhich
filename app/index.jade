@@ -10,25 +10,17 @@ html(lang='en-US')
       <!--[if lt IE 9]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
 
     .container
-      .row
-        .col-lg-
-          h1 BattleWich!!!
-      .row
-        .col-md-6.col-md-offset-3
-          form(action='#' id="loginForm")
-            input#userEmail.btn.btn-default(type='text' placeholder='enter email')
-            input#userPassword.btn.btn-default(type='text' placeholder='enter password')
-            input#loginButton.btn.btn-success.myBttnG(type='button' value='login')
-            input#registerButton.btn.btn-primary.myBttnB(type='button' value='register')
-      .row
-        .col-md-4.col-md-offset-4
-          form.logout.out
-            input#logoutButton.btn.btn-danger.myBttnR(type='button' value='logout')
 
-    .table-responsive
-      table#boardWrapper.table-bordered
-        img.tableImg(src="../images/table.png")
+      .row
+        h1 BattleWich!!!
+        .col-md-2
+          .btn-group-vertical
+              button(type="button" class="btn btn-default") Vertical
+              button(type="button" class="btn btn-default") Horizontal
 
+        .col-md-5
+          h1 Game Board
+          table#table1.gameWrapper.table-bordered
 
       // build:js js/vendor.min.js
       // bower:js

@@ -94,7 +94,7 @@ $('.gameWrapper').on('click', 'tbody tr td', function(){
 });
 
 function  placeShip() {
-  if (checkShipPlacement()) {
+  if (checkShipPlacement() && checkShipIntersection()) {
     if (gameBoard[row][col] === 0) {
       gameBoard[row][col] += 2;
       if (isHorizontal) {
@@ -107,7 +107,7 @@ function  placeShip() {
       noMoreShips();
     }
   } else {
-    alert("Ship too long for board. Please pick another space!");
+    alert("Please pick another space!");
   }
 }
 
@@ -121,6 +121,29 @@ function noMoreShips () {
 }
 
 //check if ship length overflows the board
+function checkShipIntersection(){
+  var placementFootPrint = 0,
+      rowForThisFunc     = row,
+      colForThisFunc     = col;
+
+  if (isHorizontal) {
+    for(var i = 0; i < shipLength; i++) {
+      placementFootPrint  += gameBoard[rowForThisFunc][colForThisFunc];
+      colForThisFunc++;
+    }
+  } else {
+    for(var i = 0; i < shipLength; i++) {
+      placementFootPrint  += gameBoard[rowForThisFunc][colForThisFunc]
+        rowForThisFunc++;
+    }
+  }
+  if (placementFootPrint){
+      return false;
+  } else {
+        return true;
+  }
+}
+
 
 function checkShipPlacement() {
   if (isHorizontal) {

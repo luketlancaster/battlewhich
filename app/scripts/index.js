@@ -16,8 +16,8 @@ var fb = new Firebase('https://battlewhich.firebaseio.com'),
 
 
 $(document).ready(function(){
-  clearBoard(gameBoard)
-  clearBoard(guessBoard)
+  clearBoard(gameBoard);
+  clearBoard(guessBoard);
 //  setNewGame();
   renderBoards(gameBoard, guessBoard);
   $('#shipSize').text('Current ship length: ' + shipLength);
@@ -25,7 +25,9 @@ $(document).ready(function(){
 
 function clearBoard(boardToClear){
   boardToClear.splice(0, boardToClear.length);
-  for(var i = 0; boardToClear.length < 10; i++) {boardToClear.unshift([0,0,0,0,0,0,0,0,0,0])}
+  for(var i = 0; boardToClear.length < 10; i++) {
+    boardToClear.unshift([0,0,0,0,0,0,0,0,0,0]);
+  }
 }
 
 
@@ -42,7 +44,7 @@ function setNewGame() {
     player2: '',
     isActive: true,
     player1Turn: true
-  }
+  };
   playerId = fb.child('players').push(playerObj).key();
   gameId = fb.child('games').push(gameObj).key();
 }
@@ -59,7 +61,11 @@ function renderBoards(board1, board2) {
   board1.forEach(function(row) {
     var $tr = $('<tr></tr>');
     row.forEach(function(cell) {
-      $tr.append($('<td>' + cell + '</td>'));
+      if (cell) {
+        $tr.append($('<td>' + cell + '</td>'));
+      } else {
+        $tr.append($('<td></td>'));
+      }
     });
     $tbody.append($tr);
   });
@@ -80,9 +86,11 @@ function renderBoards(board1, board2) {
 //Click to set peices
 
 $('.gameWrapper').on('click', 'tbody tr td', function(){
-      row = this.parentElement.sectionRowIndex,
-      col = this.cellIndex;
-    placeShip(); 
+  row = this.parentElement.sectionRowIndex,
+  col = this.cellIndex;
+  if (shipsArrCounter < 5){
+    placeShip();
+  }
 });
 
 function  placeShip() {
@@ -96,10 +104,19 @@ function  placeShip() {
       }
       renderBoards(gameBoard, guessBoard);
       shipLength = shipsArr[++shipsArrCounter];
-      $('#shipSize').text('Current ship length: ' + shipLength);
+      noMoreShips();
     }
   } else {
     alert("Ship too long for board. Please pick another space!");
+  }
+}
+
+function noMoreShips () {
+  if (shipsArrCounter > 4) {
+    $('button').hide();
+    $('#shipSize').text('No more ships! Fire Z Missiles!!!');
+  } else {
+    $('#shipSize').text('Current ship length: ' + shipLength);
   }
 }
 

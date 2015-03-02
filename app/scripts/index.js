@@ -8,7 +8,8 @@ var fb = new Firebase('https://battlewhich.firebaseio.com'),
   gameId,
   boardCounter = 1,
   row,
-  col;
+  col,
+  shipLength = 5;
 
 
 $(document).ready(function(){
@@ -16,6 +17,7 @@ $(document).ready(function(){
   clearBoard(guessBoard)
 //  setNewGame();
   renderBoards(gameBoard, guessBoard);
+  $('#shipSize').text('Current ship length: ' + shipLength);
 });
 
 function clearBoard(boardToClear){
@@ -107,6 +109,23 @@ $('.guessWrapper').on('click', 'tbody tr td', function(){
   }
 });
 
+
+//vertical and horizontal click
+
+$('#horizontal').click(function(){
+  horizontalFill(shipLength);
+  renderBoards(gameBoard, guessBoard);
+  shipLength--;
+  $('#shipSize').text('Current ship length: ' + shipLength);
+});
+
+$('#vertical').click(function(){
+  vertFill(shipLength);
+  renderBoards(gameBoard, guessBoard);
+  shipLength--;
+  $('#shipSize').text('Current ship length: ' + shipLength);
+});
+
 //update firebase board state
 
 function sendBoardState() {
@@ -152,14 +171,14 @@ function gameIndexIterator (arg1) {
   arg1++;
 }
 
-function horizontalFill () {
-  _.fill(gameBoard[row], 2, col, col + 5);
+function horizontalFill (shipSize) {
+  _.fill(gameBoard[row], 2, col, col + shipSize);
 }
 
-function vertFill () {
-  for(var i = 0; i < 5; i++) {
+function vertFill (shipSize) {
+  for(var i = 0; i < shipSize; i++) {
     _.fill(gameBoard[row], 2, col, col + 1);
-    row++
+    row++;
   }
 }
 

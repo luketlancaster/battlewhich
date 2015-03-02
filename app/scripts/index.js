@@ -12,7 +12,10 @@ var fb = new Firebase('https://battlewhich.firebaseio.com'),
   isHorizontal,
   shipsArr = [5,4,3,3,2],
   shipLength = shipsArr[0],
-  shipsArrCounter = 0;
+  shipsArrCounter = 0,
+  shipValueArr = [9,8,7,6,5],
+  shipValue = shipValueArr[0],
+  lastClicked;
 
 
 $(document).ready(function(){
@@ -62,7 +65,7 @@ function renderBoards(board1, board2) {
     var $tr = $('<tr></tr>');
     row.forEach(function(cell) {
       if (cell) {
-        $tr.append($('<td data-ship=' + shipsArrCounter + '>' + cell + '</td>'));
+        $tr.append($('<td>' + cell + '</td>'));
       } else {
         $tr.append($('<td></td>'));
       }
@@ -100,6 +103,7 @@ $('.gameWrapper').on('click', 'tbody tr td', function(){
 $('.guessWrapper').on('click', 'tbody tr td', function(){
   row = this.parentElement.sectionRowIndex,
   col = this.cellIndex;
+  lastClicked = gameBoard[row][col];
   hitDetector();
   renderBoards(gameBoard, guessBoard);
 });
@@ -110,10 +114,10 @@ function hitDetector(){
       guessBoard[row][col] += 1;
       alert('Miss! You Suck');
       break;
-    case (guessBoard[row][col] === 2):
-      guessBoard[row][col] += 1;
+    case (guessBoard[row][col] > 4):
+      guessBoard[row][col] = 3;
       alert('Hit! You Rock!!!');
-      sunkShip();
+      shipSunkCheck();
       gameOverCheck();
       break;
     default:
@@ -132,8 +136,9 @@ function  placeShip() {
         vertFill(shipLength);
       }
       renderBoards(gameBoard, guessBoard);
-      ++shipsArrCounter;
+      shipsArrCounter++;
       shipLength = shipsArr[shipsArrCounter];
+      shipValue = shipValueArr[shipsArrCounter];
       noMoreShips();
     }
   } else {
@@ -148,10 +153,6 @@ function noMoreShips () {
   } else {
     $('#shipSize').text('Current ship length: ' + shipLength);
   }
-}
-
-function sunkShip () {
-
 }
 
 //check if ship length overflows the board
@@ -225,11 +226,38 @@ function sendBoardState() {
 //switch between players and increment turn counter.
 function gameOverCheck () {
   var compactArr = _(gameBoard).flatten().compact().value();
-  if (!_.includes(compactArr, 2)) {
+  if (!_.includes(compactArr, 5) &&
+      !_.includes(compactArr, 6) &&
+      !_.includes(compactArr, 7) &&
+      !_.includes(compactArr, 8) &&
+      !_.includes(compactArr, 9)) {
     alert('You\'ve Won!!!');
   }
 }
 
+function shipSunkCheck() {
+  var compactArr = _(gameBoard).flatten().compact().value();
+  switch(true) {
+    case (!_.includes(compactArr, 5) && lastClicked === 5):
+      alert('You\'ve sunk my bship');
+      _.pull(compactArr, 5);
+      break;
+    case (!_.includes(compactArr, 6) && lastClicked === 6):
+      alert('You\'ve sunk my cruiser');
+      break;
+    case (!_.includes(compactArr, 7) && lastClicked === 7):
+      alert('You\'ve sunk my destroyer');
+      break;
+    case (!_.includes(compactArr, 8) && lastClicked === 8):
+      alert('You\'ve sunk my submarine');
+      break;
+    case (!_.includes(compactArr, 9) && lastClicked === 9):
+      alert('You\'ve sunk my tanker');
+      break;
+    default:
+      break;
+  }
+}
 
 
 
@@ -256,12 +284,12 @@ function gameIndexIterator (arg1) {
 }
 
 function horizontalFill (shipSize) {
-  _.fill(gameBoard[row], 2, col, col + shipSize);
+  _.fill(gameBoard[row], shipValue, col, col + shipSize);
 }
 
 function vertFill (shipSize) {
   for(var i = 0; i < shipSize; i++) {
-    _.fill(gameBoard[row], 2, col, col + 1);
+    _.fill(gameBoard[row], shipValue, col, col + 1);
     row++;
   }
 }

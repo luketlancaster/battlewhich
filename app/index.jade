@@ -13,19 +13,22 @@ html(lang='en-US')
 
       .row
         h1 BattleWich!!!
+      .row
         .col-md-2
           .btn-group-vertical
             h2#shipSize
             button.btn-success#vertical(type="button" class="btn btn-default") Vertical
             button.btn-warning#horizontal(type="button" class="btn btn-default") Horizontal
 
-        .col-md-5
+        .col-md-4
           h1 Game Board
           table#table1.gameWrapper.table-bordered
 
-        .col-md-5
+        .col-md-4
           h1 Guess Board
-          table#table2.gameWrapper.table-bordered
+          table#table2.guessWrapper.table-bordered
+
+        .col-md-2
 
       // build:js js/vendor.min.js
       // bower:js

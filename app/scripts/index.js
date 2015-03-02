@@ -2,7 +2,7 @@
 
 var fb = new Firebase('https://battlewhich.firebaseio.com'),
     gameBoard = [],
-   guessBoard = [],
+   guessBoard = gameBoard,
   //TODO: add function that toggles isPlayer1 to true or false depending on whether the player is the first or second to join the game
   playerId,
   gameId,
@@ -75,7 +75,11 @@ function renderBoards(board1, board2) {
   board2.forEach(function(row) {
     var $tr = $('<tr></tr>');
     row.forEach(function(cell) {
+      if (cell === 1 || cell === 3) {
       $tr.append($('<td>' + cell + '</td>'));
+      } else {
+        $tr.append($('<td></td>'));
+      }
     });
     $tbody2.append($tr);
   });
@@ -91,6 +95,27 @@ $('.gameWrapper').on('click', 'tbody tr td', function(){
   if (shipsArrCounter < 5){
     placeShip();
   }
+});
+
+$('.guessWrapper').on('click', 'tbody tr td', function(){
+  row = this.parentElement.sectionRowIndex,
+  col = this.cellIndex;
+  switch(true) {
+    case (guessBoard[row][col] === 0):
+      guessBoard[row][col] += 1;
+      alert('Miss! You Suck');
+      break;
+    case (guessBoard[row][col] === 1 || guessBoard[row][col] === 3):
+      alert('You guessed that already dummy!!!');
+      break;
+    case (guessBoard[row][col] === 2):
+      guessBoard[row][col] += 1;
+      alert('Hit! You Rock!!!');
+      break;
+    default:
+      break;
+  }
+  renderBoards(gameBoard, guessBoard);
 });
 
 function  placeShip() {
@@ -166,25 +191,7 @@ function checkShipPlacement() {
 //  renderBoards(gameBoard, guessBoard);
 //  shipLength--;
 
-$('.guessWrapper').on('click', 'tbody tr td', function(){
-      row = this.parentElement.sectionRowIndex,
-      col = this.cellIndex;
-  if (gameBoard[row][col] === '') {
-    gameBoard[row][col] = currPlayer;
-    sendBoardState();
-    if(checkForWin(gameBoard) === true) {
-      alert('Hooray!!! ' + currPlayer + ' wins!!!');
-      _.fill(gameBoard, ['','','','','','','','','',''] , [start=0], [end=gameBoard.length]);
-      setNewGame();
-      renderBoard(gameBoard);
-    };
-    playerTurn();
-    renderBoard(gameBoard);
-    gameOverCheck();
-  } else {
-    alert('That space is taken please choose another:)');
-  }
-});
+
 
 
 //vertical and horizontal click

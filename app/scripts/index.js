@@ -110,7 +110,6 @@ $('.guessWrapper').on('click', 'tbody tr td', function(){
 //update firebase board state
 
 function sendBoardState() {
-
   fb.child('games/' + gameId).update({
       boardState: gameBoard
   });
@@ -148,30 +147,19 @@ function gameOverCheck () {
 // }
 
 
-function checkForWin (data) {
-  switch(true) {
-    //---------------------
-    //check winning columns
-    //---------------------
-    case  ((data[0][0] !== '') && (data[0][0] === data[1][0]) && (data[0][0] === data[2][0])) ||
-          ((data[0][1] !== '') && (data[0][1] === data[1][1]) && (data[0][1] === data[2][1])) ||
-          ((data[0][2] !== '') && (data[0][2] === data[1][2]) && (data[0][2] === data[2][2])): return true;
-      break;
-    //---------------------
-    //Check winning rows
-    //---------------------
-    case  ((data[0][0] !== '') && (data[0][0] === data[0][1]) && (data[0][0] === data[0][2])) ||
-          ((data[1][0] !== '') && (data[1][0] === data[1][1]) && (data[1][0] === data[1][2])) ||
-          ((data[2][0] !== '') && (data[2][0] === data[2][1]) && (data[2][0] === data[2][2])): return true;
-      break;
-    //---------------------
-    //Check winning diagonals
-    //---------------------
-    case  ((data[0][0] !== '') && (data[0][0] === data[1][1]) && (data[0][0] === data[2][2])) ||
-          ((data[0][2] !== '') && (data[0][2] === data[1][1]) && (data[0][2] === data[2][0])): return true;
-      break;
-    default: return false;
-      break;
+function gameIndexIterator (arg1) {
+  return gameBoard[arg1];
+  arg1++;
+}
+
+function horizontalFill () {
+  _.fill(gameBoard[row], 2, col, col + 5);
+}
+
+function vertFill () {
+  for(var i = 0; i < 5; i++) {
+    _.fill(gameBoard[row], 2, col, col + 1);
+    row++
   }
 }
 

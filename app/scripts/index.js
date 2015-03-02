@@ -9,7 +9,10 @@ var fb = new Firebase('https://battlewhich.firebaseio.com'),
   boardCounter = 1,
   row,
   col,
-  shipLength = 5;
+  isHorizontal,
+  shipsArr = [5,4,3,3,2],
+  shipLength = shipsArr[0],
+  shipsArrCounter = 0;
 
 
 $(document).ready(function(){
@@ -79,15 +82,49 @@ function renderBoards(board1, board2) {
 $('.gameWrapper').on('click', 'tbody tr td', function(){
       row = this.parentElement.sectionRowIndex,
       col = this.cellIndex;
-  if (gameBoard[row][col] === 0) {
-    gameBoard[row][col] += 2;
-    renderBoards(gameBoard, guessBoard);
-  } else {
-    alert('That space is taken please choose another:)');
-  }
+    placeShip(); 
 });
 
+function  placeShip() {
+  if (checkShipPlacement()) {
+    if (gameBoard[row][col] === 0) {
+      gameBoard[row][col] += 2;
+      if (isHorizontal) {
+        horizontalFill(shipLength);
+      } else {
+        vertFill(shipLength);
+      }
+      renderBoards(gameBoard, guessBoard);
+      shipLength = shipsArr[++shipsArrCounter];
+      $('#shipSize').text('Current ship length: ' + shipLength);
+    }
+  } else {
+    alert("Ship too long for board. Please pick another space!");
+  }
+}
+
+//check if ship length overflows the board
+
+function checkShipPlacement() {
+  if (isHorizontal) {
+    if (shipLength + col > 10) {
+      return false;
+    } else {
+      return true;
+    }
+  } else {
+    if (shipLength + row > 10) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+}
+
 //click to guess
+//  vertFill(shipLength);
+//  renderBoards(gameBoard, guessBoard);
+//  shipLength--;
 
 $('.guessWrapper').on('click', 'tbody tr td', function(){
       row = this.parentElement.sectionRowIndex,
@@ -113,17 +150,11 @@ $('.guessWrapper').on('click', 'tbody tr td', function(){
 //vertical and horizontal click
 
 $('#horizontal').click(function(){
-  horizontalFill(shipLength);
-  renderBoards(gameBoard, guessBoard);
-  shipLength--;
-  $('#shipSize').text('Current ship length: ' + shipLength);
+  isHorizontal = true;
 });
 
 $('#vertical').click(function(){
-  vertFill(shipLength);
-  renderBoards(gameBoard, guessBoard);
-  shipLength--;
-  $('#shipSize').text('Current ship length: ' + shipLength);
+  isHorizontal = false;
 });
 
 //update firebase board state

@@ -62,7 +62,7 @@ function renderBoards(board1, board2) {
     var $tr = $('<tr></tr>');
     row.forEach(function(cell) {
       if (cell) {
-        $tr.append($('<td>' + cell + '</td>'));
+        $tr.append($('<td data-ship=' + shipsArrCounter + '>' + cell + '</td>'));
       } else {
         $tr.append($('<td></td>'));
       }
@@ -100,23 +100,27 @@ $('.gameWrapper').on('click', 'tbody tr td', function(){
 $('.guessWrapper').on('click', 'tbody tr td', function(){
   row = this.parentElement.sectionRowIndex,
   col = this.cellIndex;
+  hitDetector();
+  renderBoards(gameBoard, guessBoard);
+});
+
+function hitDetector(){
   switch(true) {
     case (guessBoard[row][col] === 0):
       guessBoard[row][col] += 1;
       alert('Miss! You Suck');
       break;
-    case (guessBoard[row][col] === 1 || guessBoard[row][col] === 3):
-      alert('You guessed that already dummy!!!');
-      break;
     case (guessBoard[row][col] === 2):
       guessBoard[row][col] += 1;
       alert('Hit! You Rock!!!');
+      sunkShip();
+      gameOverCheck();
       break;
     default:
+      alert('You guessed that already dummy!!!');
       break;
   }
-  renderBoards(gameBoard, guessBoard);
-});
+}
 
 function  placeShip() {
   if (checkShipPlacement() && checkShipIntersection()) {
@@ -128,7 +132,8 @@ function  placeShip() {
         vertFill(shipLength);
       }
       renderBoards(gameBoard, guessBoard);
-      shipLength = shipsArr[++shipsArrCounter];
+      ++shipsArrCounter;
+      shipLength = shipsArr[shipsArrCounter];
       noMoreShips();
     }
   } else {
@@ -143,6 +148,10 @@ function noMoreShips () {
   } else {
     $('#shipSize').text('Current ship length: ' + shipLength);
   }
+}
+
+function sunkShip () {
+
 }
 
 //check if ship length overflows the board
@@ -216,11 +225,8 @@ function sendBoardState() {
 //switch between players and increment turn counter.
 function gameOverCheck () {
   var compactArr = _(gameBoard).flatten().compact().value();
-  if (_.difference(compactArr, ['m']).length === 4) {
-    alert('You sunk my BS');
-    _.fill(gameBoard, [0,0,0,0,0,0,0,0,0,0] , [start=0], [end=gameBoard.length]);
-    setNewGame();
-    renderBoard(gameBoard);
+  if (!_.includes(compactArr, 2)) {
+    alert('You\'ve Won!!!');
   }
 }
 

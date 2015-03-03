@@ -1,30 +1,68 @@
 'use strict';
 
-var fb = new Firebase('https://battlewhich.firebaseio.com'),
-    gameBoard = [],
-   guessBoard = gameBoard,
-  //TODO: add function that toggles isPlayer1 to true or false depending on whether the player is the first or second to join the game
-  playerId,
-  gameId,
-  boardCounter = 1,
-  row,
-  col,
-  isHorizontal,
-  shipsArr = [5,4,3,3,2],
-  shipLength = shipsArr[0],
-  shipsArrCounter = 0,
-  shipValueArr = [9,8,7,6,5],
-  shipValue = shipValueArr[0],
-  lastClicked;
+//============================================
+//============================================
+//============================================
+// Setup Globals
+//============================================
+//============================================
+//============================================
+
+var              fb = new Firebase('https://battlewhich.firebaseio.com'),
+          gameBoard = [],
+         guessBoard = gameBoard,
+           shipsArr = [5,4,3,3,2],
+         shipLength = shipsArr[0],
+    shipsArrCounter = 0,
+       shipValueArr = [9,8,7,6,5],
+          shipValue = shipValueArr[0],
+           isActive = true,
+      isHorizontal,
+          playerId,
+            gameId,
+       lastClicked,
+               row,
+               col;
+
+//============================================
+//============================================
+//============================================
+// Declare functions
+//============================================
+//============================================
+//============================================
 
 
-$(document).ready(function(){
-  clearBoard(gameBoard);
-  clearBoard(guessBoard);
-//  setNewGame();
-  renderBoards(gameBoard, guessBoard);
-  $('#shipSize').text('Current ship length: ' + shipLength);
-});
+//   //function to toggle player turn to true or false
+//   //also toggles whose turn it currently is in the game object
+
+// function toggleTurn(turnCounter) {
+//   if (turnCounter % 2 === 1) {
+//     fb.child('players/' + playerId).update({
+//       isTurn: true,
+//       winner: playerId
+//     });
+//   }
+//   fb.child('games/' + gameId).update({
+//     player1Turn: ,
+//     winner: playerId
+//   });
+// }
+
+//============================================
+//============================================
+// GAME SETUP FUNCTIONS
+//============================================
+//============================================
+
+
+
+
+
+
+//============================================
+// creates an empty 2d arry 10 x 10.
+//============================================
 
 function clearBoard(boardToClear){
   boardToClear.splice(0, boardToClear.length);
@@ -33,27 +71,10 @@ function clearBoard(boardToClear){
   }
 }
 
+//============================================
+// Creates the DOM representation of the boardArrays
+//============================================
 
-function setNewGame() {
-  var playerObj = {
-    isPlayer1: true,
-    isTurn: true
-  };
-  var gameObj = {
-    boardState: gameBoard,
-    winner: '',
-    loser: '',
-    player1: '',
-    player2: '',
-    isActive: true,
-    player1Turn: true
-  };
-  playerId = fb.child('players').push(playerObj).key();
-  gameId = fb.child('games').push(gameObj).key();
-}
-
-
-//Create board
 
 function renderBoards(board1, board2) {
   $('#table1,#table2').empty();
@@ -90,43 +111,12 @@ function renderBoards(board1, board2) {
 }
 
 
-//Click to set peices
 
-$('.gameWrapper').on('click', 'tbody tr td', function(){
-  row = this.parentElement.sectionRowIndex,
-  col = this.cellIndex;
-  if (shipsArrCounter < 5){
-    placeShip();
-  }
-});
+//============================================
+// checks for valid placement, populates gameArray and rerenders the board.
+//============================================
 
-$('.guessWrapper').on('click', 'tbody tr td', function(){
-  row = this.parentElement.sectionRowIndex,
-  col = this.cellIndex;
-  lastClicked = gameBoard[row][col];
-  hitDetector();
-  renderBoards(gameBoard, guessBoard);
-});
-
-function hitDetector(){
-  switch(true) {
-    case (guessBoard[row][col] === 0):
-      guessBoard[row][col] += 1;
-      alert('Miss! You Suck');
-      break;
-    case (guessBoard[row][col] > 4):
-      guessBoard[row][col] = 3;
-      alert('Hit! You Rock!!!');
-      shipSunkCheck();
-      gameOverCheck();
-      break;
-    default:
-      alert('You guessed that already dummy!!!');
-      break;
-  }
-}
-
-function  placeShip() {
+function placeShip() {
   if (checkShipPlacement() && checkShipIntersection()) {
     if (gameBoard[row][col] === 0) {
       gameBoard[row][col] += 2;
@@ -146,16 +136,10 @@ function  placeShip() {
   }
 }
 
-function noMoreShips () {
-  if (shipsArrCounter > 4) {
-    $('button').hide();
-    $('#shipSize').text('No more ships! Fire Z Missiles!!!');
-  } else {
-    $('#shipSize').text('Current ship length: ' + shipLength);
-  }
-}
+//============================================
+// check if ships intersect with each other.
+//============================================
 
-//check if ship length overflows the board
 function checkShipIntersection(){
   var placementFootPrint = 0,
       rowForThisFunc     = row,
@@ -179,6 +163,9 @@ function checkShipIntersection(){
   }
 }
 
+//============================================
+// check if ship length overflows the board
+//============================================
 
 function checkShipPlacement() {
   if (isHorizontal) {
@@ -196,44 +183,69 @@ function checkShipPlacement() {
   }
 }
 
-//click to guess
-//  vertFill(shipLength);
-//  renderBoards(gameBoard, guessBoard);
-//  shipLength--;
+//============================================
+// Hides Orientation buttons and indicates to commence guesses.
+//============================================
 
-
-
-
-//vertical and horizontal click
-
-$('#horizontal').click(function(){
-  isHorizontal = true;
-});
-
-$('#vertical').click(function(){
-  isHorizontal = false;
-});
-
-//update firebase board state
-
-function sendBoardState() {
-  fb.child('games/' + gameId).update({
-      boardState: gameBoard
-  });
-}
-
-
-//switch between players and increment turn counter.
-function gameOverCheck () {
-  var compactArr = _(gameBoard).flatten().compact().value();
-  if (!_.includes(compactArr, 5) &&
-      !_.includes(compactArr, 6) &&
-      !_.includes(compactArr, 7) &&
-      !_.includes(compactArr, 8) &&
-      !_.includes(compactArr, 9)) {
-    alert('You\'ve Won!!!');
+function noMoreShips () {
+  if (shipsArrCounter > 4) {
+    $('button').hide();
+    $('#shipSize').text('No more ships! Fire Z Missiles!!!');
+  } else {
+    $('#shipSize').text('Current ship length: ' + shipLength);
   }
 }
+
+//============================================
+// Filling the array  with ships at players chosen location.
+//============================================
+
+function horizontalFill (shipSize) {
+  _.fill(gameBoard[row], shipValue, col, col + shipSize);
+}
+
+function vertFill (shipSize) {
+  for(var i = 0; i < shipSize; i++) {
+    _.fill(gameBoard[row], shipValue, col, col + 1);
+    row++;
+  }
+}
+
+
+
+//============================================
+//============================================
+// GAME PLAY FUNCTIONS
+//============================================
+//============================================
+
+
+
+//============================================
+// detects whether a selection is a hit or miss
+//============================================
+
+function hitDetector(){
+  switch(true) {
+    case (guessBoard[row][col] === 0):
+      guessBoard[row][col] += 1;
+      alert('Miss! You Suck');
+      break;
+    case (guessBoard[row][col] > 4):
+      guessBoard[row][col] = 3;
+      alert('Hit! You Rock!!!');
+      shipSunkCheck();
+      gameOverCheck();
+      break;
+    default:
+      alert('You guessed that already dummy!!!');
+      break;
+  }
+}
+
+//============================================
+// checks which ships have been sunk.
+//============================================
 
 function shipSunkCheck() {
   var compactArr = _(gameBoard).flatten().compact().value();
@@ -259,56 +271,39 @@ function shipSunkCheck() {
   }
 }
 
+//============================================
+// checks if all ships are sunk
+//============================================
 
-
-//   //function to toggle player turn to true or false
-//   //also toggles whose turn it currently is in the game object
-
-// function toggleTurn(turnCounter) {
-//   if (turnCounter % 2 === 1) {
-//     fb.child('players/' + playerId).update({
-//       isTurn: true,
-//       winner: playerId
-//     });
-//   }
-//   fb.child('games/' + gameId).update({
-//     player1Turn: ,
-//     winner: playerId
-//   });
-// }
-
-
-function gameIndexIterator (arg1) {
-  return gameBoard[arg1];
-  arg1++;
-}
-
-function horizontalFill (shipSize) {
-  _.fill(gameBoard[row], shipValue, col, col + shipSize);
-}
-
-function vertFill (shipSize) {
-  for(var i = 0; i < shipSize; i++) {
-    _.fill(gameBoard[row], shipValue, col, col + 1);
-    row++;
+function gameOverCheck () {
+  var compactArr = _(gameBoard).flatten().compact().value();
+  if (!_.includes(compactArr, 5) &&
+      !_.includes(compactArr, 6) &&
+      !_.includes(compactArr, 7) &&
+      !_.includes(compactArr, 8) &&
+      !_.includes(compactArr, 9)) {
+    alert('You\'ve Won!!!');
+    isActive = false;
   }
 }
 
 
 
-//alternates between player turns
 
-function playerTurn () {
-  if (currPlayer === player1) {
-    currPlayer = player2;
-    return player1;
-  } else {
-    currPlayer = player1;
-    return player2;
-  }
+//============================================
+// update firebase board state
+//============================================
+
+function sendBoardState() {
+  fb.child('games/' + gameId).update({
+      boardState: gameBoard
+  });
 }
 
-//toggle stats for game on win event include game active winner and loser
+
+//============================================
+// toggle stats for game on win event include game active winner and loser
+//============================================
 
 function toggleCurrGameStats() {
   fb.child('games/' + gameId).update({
@@ -317,27 +312,74 @@ function toggleCurrGameStats() {
   });
 }
 
+//============================================
+// sets a couple firebase objects
+//============================================
 
-//sets the current player's image based on whether isPlayer1 is true or false
+function setNewGame() {
+  var playerObj = {
+    isPlayer1: true,
+    isTurn: true
+  };
+  var gameObj = {
+    boardState: gameBoard,
+    winner: '',
+    loser: '',
+    player1: '',
+    player2: '',
+    isActive: true,
+    player1Turn: true
+  };
+  playerId = fb.child('players').push(playerObj).key();
+  gameId = fb.child('games').push(gameObj).key();
+}
+
+//============================================
+//============================================
+//============================================
+// Setup a fresh board on page load.
+//============================================
+//============================================
+//============================================
 
 
 
-//gets current player stats
+$(document).ready(function(){
+  clearBoard(gameBoard);
+  clearBoard(guessBoard);
+  renderBoards(gameBoard, guessBoard);
+  $('#shipSize').text('Current ship length: ' + shipLength);
+});
 
-// function getCurrentStat (data) {
+//============================================
+// Clicks to set peices
+//============================================
 
-//  $.getJSON('https://battlewhich.firebaseio.com/players/' + data + '.json', function(data){
-//   return data;
-//   })
-// }
+$('.gameWrapper').on('click', 'tbody tr td', function(){
+  if(isActive) {
+    row = this.parentElement.sectionRowIndex,
+    col = this.cellIndex;
+    if (shipsArrCounter < 5){
+      placeShip();
+    }
+  }
+});
 
-//modular function to get player data
+$('.guessWrapper').on('click', 'tbody tr td', function(){
+  if(isActive) {
+    row = this.parentElement.sectionRowIndex,
+    col = this.cellIndex;
+    lastClicked = gameBoard[row][col];
+    hitDetector();
+    renderBoards(gameBoard, guessBoard);
+  }
+});
 
-// function getPlayerInfo () {
-// var playerInfo = fb.getAuth(),
-//       playerId = playerInfo.uid,
-//       fb.child('players/' + playerId) = $.getJSON('https://battlewhich.firebaseio.com/players/' + playerId + '.json', function (cb) {
-//         return fb.child('players/' + playerId);
-//       })
-//       return fb.child('players/' + playerId);
-// }
+
+$('#horizontal').click(function(){
+  isHorizontal = true;
+});
+
+$('#vertical').click(function(){
+  isHorizontal = false;
+});

@@ -18,11 +18,12 @@ var              fb = new Firebase('https://battlewhich.firebaseio.com'),
           shipValue = shipValueArr[0],
            isActive = true,
       isHorizontal,
-          playerId,
             gameId,
        lastClicked,
                row,
-               col;
+               col,
+          currGame,
+          gameInfo;
 
 //============================================
 //============================================
@@ -125,6 +126,7 @@ function placeShip() {
       } else {
         vertFill(shipLength);
       }
+      findActiveGame(); //moved earlier so server has time to respond with current game info - BF
       renderBoards(gameBoard, guessBoard);
       shipsArrCounter++;
       shipLength = shipsArr[shipsArrCounter];
@@ -189,6 +191,7 @@ function checkShipPlacement() {
 
 function noMoreShips () {
   if (shipsArrCounter > 4) {
+    fbSetNewGame()
     $('button').hide();
     $('#shipSize').text('No more ships! Fire Z Missiles!!!');
   } else {
@@ -288,51 +291,65 @@ function gameOverCheck () {
 }
 
 
+//==============================================
+// Finds active game after player sets all ships
+//==============================================
 
-
-//============================================
-// update firebase board state
-//============================================
-
-function sendBoardState() {
-  fb.child('games/' + gameId).update({
-      boardState: gameBoard
-  });
-}
-
-
-//============================================
-// toggle stats for game on win event include game active winner and loser
-//============================================
-
-function toggleCurrGameStats() {
-  fb.child('games/' + gameId).update({
-    isActive: false,
-    winner: playerId
-  });
+function findActiveGame () {
+  fb.once('value', function (data) {
+    var allGames = data.val();
+    currGame = _.findKey(allGames, {
+      'isActive': true,
+      'hasP2': false
+    });
+  })
 }
 
 //============================================
 // sets a couple firebase objects
 //============================================
 
-function setNewGame() {
-  var playerObj = {
-    isPlayer1: true,
-    isTurn: true
-  };
-  var gameObj = {
-    boardState: gameBoard,
-    winner: '',
-    loser: '',
-    player1: '',
-    player2: '',
-    isActive: true,
-    player1Turn: true
-  };
-  playerId = fb.child('players').push(playerObj).key();
-  gameId = fb.child('games').push(gameObj).key();
-}
+function fbSetNewGame() {
+ gameInfo = $.getJSON('https://battlewhich.firebaseio.com/' + currGame + '/.json/', function () {
+        console.log(gameInfo);
+        console.log(gameInfo.responseJSON);
+      })
+
+  if (!currGame) {
+    console.log('you created a new game')
+    // clearBoard(gameBoard);
+    // clearBoard(guessBoard);
+
+    var gameObj = {
+      p1BoardState: guessBoard, //player 1 sends their guess board data to player 2 - BF
+      p2BoardState: [],
+      isActive: true,
+      hasP1: true,
+      hasP2: false,
+      waitingForP2Board: true,
+      waitingForP1Board: false
+      //player1Turn: true
+    };
+    gameId = fb.push(gameObj).key();
+    currGame = gameId; // so both player 1 and 2 have the current game id - BF
+
+    //fb.child('gameId').on('value', function (data) {
+    // renderBoards(gameBoard, guessBoard);
+    } else {
+      console.log('you should have joined an existing game')
+      //joins existing game and adds P2 board to game object and sets waiting for p2 board to false and has p2 to true
+      fb.child(currGame).update({
+        'p2BoardState': guessBoard,
+        'hasP2': true,
+        'waitingForP2Board': false
+      })
+    }
+
+       // fb.child(currGame).once('value', function(data) {
+       // gameInfo = data.val();
+  }
+
+
 
 //============================================
 //============================================
@@ -348,6 +365,7 @@ $(document).ready(function(){
   clearBoard(gameBoard);
   clearBoard(guessBoard);
   renderBoards(gameBoard, guessBoard);
+  //fbSetNewGame();
   $('#shipSize').text('Current ship length: ' + shipLength);
 });
 

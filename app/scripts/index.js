@@ -17,6 +17,12 @@ var              fb = new Firebase('https://battlewhich.firebaseio.com'),
        shipValueArr = [9,8,7,6,5],
           shipValue = shipValueArr[0],
            isActive = true,
+            missImg = 'http://cdn.flaticon.com/png/256/61072.png',
+             hitImg = 'http://cdn.flaticon.com/png/256/2187.png',
+         twoShipImg = 'http://cdn.flaticon.com/png/256/16489.png',
+       threeShipImg = 'http://cdn.flaticon.com/png/256/62913.png',
+        fourShipImg = 'http://cdn.flaticon.com/png/256/46053.png',
+        fiveShipImg = 'http://cdn.flaticon.com/png/256/45783.png',
       isHorizontal,
             gameId,
        lastClicked,
@@ -86,8 +92,16 @@ function renderBoards(board1, board2) {
   board1.forEach(function(row) {
     var $tr = $('<tr></tr>');
     row.forEach(function(cell) {
-      if (cell) {
-        $tr.append($('<td>' + cell + '</td>'));
+      if (cell === 5) {
+        $tr.append($('<td><img src=' + twoShipImg + '></td>'));
+      } else if (cell === 6) {
+        $tr.append($('<td><img src=' + threeShipImg + '></td>'));
+      } else if (cell === 7) {
+        $tr.append($('<td><img src=' + threeShipImg + '></td>'));
+      } else if (cell === 8) {
+        $tr.append($('<td><img src=' + fourShipImg + '></td>'));
+      } else if (cell === 9) {
+        $tr.append($('<td><img src=' + fiveShipImg + '></td>'));
       } else {
         $tr.append($('<td></td>'));
       }
@@ -100,8 +114,10 @@ function renderBoards(board1, board2) {
   board2.forEach(function(row) {
     var $tr = $('<tr></tr>');
     row.forEach(function(cell) {
-      if (cell === 1 || cell === 3) {
-      $tr.append($('<td>' + cell + '</td>'));
+      if (cell === 1) {
+        $tr.append($('<td><img src=' + missImg + '></td>'));
+      } else if (cell === 3) {
+        $tr.append($('<td><img src=' + hitImg + '></td>'));
       } else {
         $tr.append($('<td></td>'));
       }
@@ -110,7 +126,6 @@ function renderBoards(board1, board2) {
   });
   $('#table2').append($tbody2);
 }
-
 
 
 //============================================
@@ -193,7 +208,9 @@ function noMoreShips () {
   if (shipsArrCounter > 4) {
     fbSetNewGame()
     $('button').hide();
-    $('#shipSize').text('No more ships! Fire Z Missiles!!!');
+    $('#shipSize').toggleClass('hidden');
+    $('#infoBoard').text('No more lil\' ships, fire away!');
+    $('.guessesDiv').toggleClass('hidden');
   } else {
     $('#shipSize').text('Current ship length: ' + shipLength);
   }

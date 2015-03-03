@@ -102,6 +102,10 @@ function renderBoards(board1, board2) {
         $tr.append($('<td><img src=' + fourShipImg + '></td>'));
       } else if (cell === 9) {
         $tr.append($('<td><img src=' + fiveShipImg + '></td>'));
+      } else if (cell === 1) {
+        $tr.append($('<td><img src=' + missImg + '></td>'));
+      } else if (cell === 3) {
+        $tr.append($('<td><img src=' + hitImg + '></td>'));
       } else {
         $tr.append($('<td></td>'));
       }
@@ -249,16 +253,16 @@ function hitDetector(){
   switch(true) {
     case (guessBoard[row][col] === 0):
       guessBoard[row][col] += 1;
-      alert('Miss! You Suck');
+      $('#hitsOrMisses').text('Miss!');
       break;
     case (guessBoard[row][col] > 4):
       guessBoard[row][col] = 3;
-      alert('Hit! You Rock!!!');
+      $('#hitsOrMisses').text('You hit a lil\' ship!');
       shipSunkCheck();
       gameOverCheck();
       break;
     default:
-      alert('You guessed that already dummy!!!');
+      $('#hitsOrMisses').text('Already tried that, chose another!');
       break;
   }
 }
@@ -271,20 +275,20 @@ function shipSunkCheck() {
   var compactArr = _(gameBoard).flatten().compact().value();
   switch(true) {
     case (!_.includes(compactArr, 5) && lastClicked === 5):
-      alert('You\'ve sunk my bship');
+      $('#shipSunk').text('Sunk the lil\' sailboat!');
       _.pull(compactArr, 5);
       break;
     case (!_.includes(compactArr, 6) && lastClicked === 6):
-      alert('You\'ve sunk my cruiser');
+      $('#shipSunk').text('Sunk the lil\' cruiser!');
       break;
     case (!_.includes(compactArr, 7) && lastClicked === 7):
-      alert('You\'ve sunk my destroyer');
+      $('#shipSunk').text('Sunk the lil\' tanker!');
       break;
     case (!_.includes(compactArr, 8) && lastClicked === 8):
-      alert('You\'ve sunk my submarine');
+      $('#shipSunk').text('Sunk the lil\' cargo ship!');
       break;
     case (!_.includes(compactArr, 9) && lastClicked === 9):
-      alert('You\'ve sunk my tanker');
+      $('#shipSunk').text('Sunk the lil\' battleship!');
       break;
     default:
       break;
@@ -302,7 +306,7 @@ function gameOverCheck () {
       !_.includes(compactArr, 7) &&
       !_.includes(compactArr, 8) &&
       !_.includes(compactArr, 9)) {
-    alert('You\'ve Won!!!');
+    $('#infoBoard').text('You sunk all the lil\' ships! You won!');
     isActive = false;
   }
 }

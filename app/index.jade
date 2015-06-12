@@ -4,7 +4,7 @@ html(lang='en-US')
     meta(charset='utf-8')
     meta(http-equiv='X-UA-Compatible', content='IE=edge')
     meta(name='viewport', content='width=device-width, initial-scale=1')
-    title My Title
+    title Sink the Ship!
     link(rel='stylesheet', href='css/main.css')
   body
       <!--[if lt IE 9]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
@@ -12,23 +12,28 @@ html(lang='en-US')
     .container
 
       .row
-        h1 BattleWich!!!
+        h1 Lil' Ships
+        h2#infoBoard Select a direction, then place your ship!
       .row
         .col-md-2
           .btn-group-vertical
-            h2#shipSize
             button.btn-success#vertical(type="button" class="btn btn-default") Vertical
             button.btn-warning#horizontal(type="button" class="btn btn-default") Horizontal
+            h2#shipSize
+
 
         .col-md-4
           h1 Game Board
           table#table1.gameWrapper.table-bordered
 
         .col-md-4
-          h1 Guess Board
-          table#table2.guessWrapper.table-bordered
+          .guessesDiv.hidden
+            h1 Guess Board
+            table#table2.guessWrapper.table-bordered
 
         .col-md-2
+          h3#hitsOrMisses
+          h4#shipSunk
 
       // build:js js/vendor.min.js
       // bower:js

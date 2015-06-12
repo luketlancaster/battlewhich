@@ -17,12 +17,19 @@ var              fb = new Firebase('https://battlewhich.firebaseio.com'),
        shipValueArr = [9,8,7,6,5],
           shipValue = shipValueArr[0],
            isActive = true,
+            missImg = 'http://cdn.flaticon.com/png/256/61072.png',
+             hitImg = 'http://cdn.flaticon.com/png/256/2187.png',
+         twoShipImg = 'http://cdn.flaticon.com/png/256/16489.png',
+       threeShipImg = 'http://cdn.flaticon.com/png/256/62913.png',
+        fourShipImg = 'http://cdn.flaticon.com/png/256/46053.png',
+        fiveShipImg = 'http://cdn.flaticon.com/png/256/45783.png',
       isHorizontal,
-          playerId,
             gameId,
        lastClicked,
                row,
-               col;
+               col,
+          currGame,
+          gameInfo;
 
 //============================================
 //============================================
@@ -85,8 +92,20 @@ function renderBoards(board1, board2) {
   board1.forEach(function(row) {
     var $tr = $('<tr></tr>');
     row.forEach(function(cell) {
-      if (cell) {
-        $tr.append($('<td>' + cell + '</td>'));
+      if (cell === 5) {
+        $tr.append($('<td><img src=' + twoShipImg + '></td>'));
+      } else if (cell === 6) {
+        $tr.append($('<td><img src=' + threeShipImg + '></td>'));
+      } else if (cell === 7) {
+        $tr.append($('<td><img src=' + threeShipImg + '></td>'));
+      } else if (cell === 8) {
+        $tr.append($('<td><img src=' + fourShipImg + '></td>'));
+      } else if (cell === 9) {
+        $tr.append($('<td><img src=' + fiveShipImg + '></td>'));
+      } else if (cell === 1) {
+        $tr.append($('<td><img src=' + missImg + '></td>'));
+      } else if (cell === 3) {
+        $tr.append($('<td><img src=' + hitImg + '></td>'));
       } else {
         $tr.append($('<td></td>'));
       }
@@ -99,8 +118,10 @@ function renderBoards(board1, board2) {
   board2.forEach(function(row) {
     var $tr = $('<tr></tr>');
     row.forEach(function(cell) {
-      if (cell === 1 || cell === 3) {
-      $tr.append($('<td>' + cell + '</td>'));
+      if (cell === 1) {
+        $tr.append($('<td><img src=' + missImg + '></td>'));
+      } else if (cell === 3) {
+        $tr.append($('<td><img src=' + hitImg + '></td>'));
       } else {
         $tr.append($('<td></td>'));
       }
@@ -109,7 +130,6 @@ function renderBoards(board1, board2) {
   });
   $('#table2').append($tbody2);
 }
-
 
 
 //============================================
@@ -125,6 +145,7 @@ function placeShip() {
       } else {
         vertFill(shipLength);
       }
+      findActiveGame(); //moved earlier so server has time to respond with current game info - BF
       renderBoards(gameBoard, guessBoard);
       shipsArrCounter++;
       shipLength = shipsArr[shipsArrCounter];
@@ -189,8 +210,11 @@ function checkShipPlacement() {
 
 function noMoreShips () {
   if (shipsArrCounter > 4) {
+    fbSetNewGame()
     $('button').hide();
-    $('#shipSize').text('No more ships! Fire Z Missiles!!!');
+    $('#shipSize').toggleClass('hidden');
+    $('#infoBoard').text('No more lil\' ships, fire away!');
+    $('.guessesDiv').toggleClass('hidden');
   } else {
     $('#shipSize').text('Current ship length: ' + shipLength);
   }
@@ -229,16 +253,16 @@ function hitDetector(){
   switch(true) {
     case (guessBoard[row][col] === 0):
       guessBoard[row][col] += 1;
-      alert('Miss! You Suck');
+      $('#hitsOrMisses').text('Miss!');
       break;
     case (guessBoard[row][col] > 4):
       guessBoard[row][col] = 3;
-      alert('Hit! You Rock!!!');
+      $('#hitsOrMisses').text('You hit a lil\' ship!');
       shipSunkCheck();
       gameOverCheck();
       break;
     default:
-      alert('You guessed that already dummy!!!');
+      $('#hitsOrMisses').text('Already tried that, chose another!');
       break;
   }
 }
@@ -251,20 +275,20 @@ function shipSunkCheck() {
   var compactArr = _(gameBoard).flatten().compact().value();
   switch(true) {
     case (!_.includes(compactArr, 5) && lastClicked === 5):
-      alert('You\'ve sunk my bship');
+      $('#shipSunk').text('Sunk the lil\' sailboat!');
       _.pull(compactArr, 5);
       break;
     case (!_.includes(compactArr, 6) && lastClicked === 6):
-      alert('You\'ve sunk my cruiser');
+      $('#shipSunk').text('Sunk the lil\' cruiser!');
       break;
     case (!_.includes(compactArr, 7) && lastClicked === 7):
-      alert('You\'ve sunk my destroyer');
+      $('#shipSunk').text('Sunk the lil\' tanker!');
       break;
     case (!_.includes(compactArr, 8) && lastClicked === 8):
-      alert('You\'ve sunk my submarine');
+      $('#shipSunk').text('Sunk the lil\' cargo ship!');
       break;
     case (!_.includes(compactArr, 9) && lastClicked === 9):
-      alert('You\'ve sunk my tanker');
+      $('#shipSunk').text('Sunk the lil\' battleship!');
       break;
     default:
       break;
@@ -282,57 +306,71 @@ function gameOverCheck () {
       !_.includes(compactArr, 7) &&
       !_.includes(compactArr, 8) &&
       !_.includes(compactArr, 9)) {
-    alert('You\'ve Won!!!');
+    $('#infoBoard').text('You sunk all the lil\' ships! You won!');
     isActive = false;
   }
 }
 
 
+//==============================================
+// Finds active game after player sets all ships
+//==============================================
 
-
-//============================================
-// update firebase board state
-//============================================
-
-function sendBoardState() {
-  fb.child('games/' + gameId).update({
-      boardState: gameBoard
-  });
-}
-
-
-//============================================
-// toggle stats for game on win event include game active winner and loser
-//============================================
-
-function toggleCurrGameStats() {
-  fb.child('games/' + gameId).update({
-    isActive: false,
-    winner: playerId
-  });
+function findActiveGame () {
+  fb.once('value', function (data) {
+    var allGames = data.val();
+    currGame = _.findKey(allGames, {
+      'isActive': true,
+      'hasP2': false
+    });
+  })
 }
 
 //============================================
 // sets a couple firebase objects
 //============================================
 
-function setNewGame() {
-  var playerObj = {
-    isPlayer1: true,
-    isTurn: true
-  };
-  var gameObj = {
-    boardState: gameBoard,
-    winner: '',
-    loser: '',
-    player1: '',
-    player2: '',
-    isActive: true,
-    player1Turn: true
-  };
-  playerId = fb.child('players').push(playerObj).key();
-  gameId = fb.child('games').push(gameObj).key();
-}
+function fbSetNewGame() {
+ gameInfo = $.getJSON('https://battlewhich.firebaseio.com/' + currGame + '/.json/', function () {
+        console.log(gameInfo);
+        console.log(gameInfo.responseJSON);
+      })
+
+  if (!currGame) {
+    console.log('you created a new game')
+    // clearBoard(gameBoard);
+    // clearBoard(guessBoard);
+
+    var gameObj = {
+      p1BoardState: guessBoard, //player 1 sends their guess board data to player 2 - BF
+      p2BoardState: [],
+      isActive: true,
+      hasP1: true,
+      hasP2: false,
+      waitingForP2Board: true,
+      waitingForP1Board: false
+      //player1Turn: true
+    };
+    gameId = fb.push(gameObj).key();
+    currGame = gameId; // so both player 1 and 2 have the current game id - BF
+
+    //fb.child('gameId').on('value', function (data) {
+    // renderBoards(gameBoard, guessBoard);
+    } else {
+      console.log('you should have joined an existing game')
+      //joins existing game and adds P2 board to game object and sets waiting for p2 board to false and has p2 to true
+      fb.child(currGame).update({
+        'p2BoardState': guessBoard,
+        'hasP2': true,
+        'waitingForP2Board': false
+      })
+    }
+
+       // fb.child(currGame).once('value', function(data) {
+       // gameInfo = data.val();
+  }
+
+
 
 //============================================
 //============================================
@@ -348,6 +386,7 @@ $(document).ready(function(){
   clearBoard(gameBoard);
   clearBoard(guessBoard);
   renderBoards(gameBoard, guessBoard);
+  //fbSetNewGame();
   $('#shipSize').text('Current ship length: ' + shipLength);
 });
 

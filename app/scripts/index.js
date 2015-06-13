@@ -8,8 +8,7 @@
 //============================================
 //============================================
 
-var              fb = new Firebase('https://battlewhich.firebaseio.com'),
-          gameBoard = [],
+      var gameBoard = [],
          guessBoard = gameBoard,
            shipsArr = [5,4,3,3,2],
          shipLength = shipsArr[0],
@@ -39,10 +38,6 @@ var              fb = new Firebase('https://battlewhich.firebaseio.com'),
 //============================================
 //============================================
 
-
-//   //function to toggle player turn to true or false
-//   //also toggles whose turn it currently is in the game object
-
 // function toggleTurn(turnCounter) {
 //   if (turnCounter % 2 === 1) {
 //     fb.child('players/' + playerId).update({
@@ -61,11 +56,6 @@ var              fb = new Firebase('https://battlewhich.firebaseio.com'),
 // GAME SETUP FUNCTIONS
 //============================================
 //============================================
-
-
-
-
-
 
 //============================================
 // creates an empty 2d arry 10 x 10.
@@ -145,7 +135,6 @@ function placeShip() {
       } else {
         vertFill(shipLength);
       }
-      findActiveGame(); //moved earlier so server has time to respond with current game info - BF
       renderBoards(gameBoard, guessBoard);
       shipsArrCounter++;
       shipLength = shipsArr[shipsArrCounter];
@@ -210,7 +199,6 @@ function checkShipPlacement() {
 
 function noMoreShips () {
   if (shipsArrCounter > 4) {
-    fbSetNewGame()
     $('button').hide();
     $('#shipSize').toggleClass('hidden');
     $('#infoBoard').text('No more lil\' ships, fire away!');
@@ -307,70 +295,9 @@ function gameOverCheck () {
       !_.includes(compactArr, 8) &&
       !_.includes(compactArr, 9)) {
     $('#infoBoard').text('You sunk all the lil\' ships! You won!');
-    isActive = false;
+    isActive = false
   }
 }
-
-
-//==============================================
-// Finds active game after player sets all ships
-//==============================================
-
-function findActiveGame () {
-  fb.once('value', function (data) {
-    var allGames = data.val();
-    currGame = _.findKey(allGames, {
-      'isActive': true,
-      'hasP2': false
-    });
-  })
-}
-
-//============================================
-// sets a couple firebase objects
-//============================================
-
-function fbSetNewGame() {
- gameInfo = $.getJSON('https://battlewhich.firebaseio.com/' + currGame + '/.json/', function () {
-        console.log(gameInfo);
-        console.log(gameInfo.responseJSON);
-      })
-
-  if (!currGame) {
-    console.log('you created a new game')
-    // clearBoard(gameBoard);
-    // clearBoard(guessBoard);
-
-    var gameObj = {
-      p1BoardState: guessBoard, //player 1 sends their guess board data to player 2 - BF
-      p2BoardState: [],
-      isActive: true,
-      hasP1: true,
-      hasP2: false,
-      waitingForP2Board: true,
-      waitingForP1Board: false
-      //player1Turn: true
-    };
-    gameId = fb.push(gameObj).key();
-    currGame = gameId; // so both player 1 and 2 have the current game id - BF
-
-    //fb.child('gameId').on('value', function (data) {
-    // renderBoards(gameBoard, guessBoard);
-    } else {
-      console.log('you should have joined an existing game')
-      //joins existing game and adds P2 board to game object and sets waiting for p2 board to false and has p2 to true
-      fb.child(currGame).update({
-        'p2BoardState': guessBoard,
-        'hasP2': true,
-        'waitingForP2Board': false
-      })
-    }
-
-       // fb.child(currGame).once('value', function(data) {
-       // gameInfo = data.val();
-  }
-
-
 
 //============================================
 //============================================
@@ -386,7 +313,6 @@ $(document).ready(function(){
   clearBoard(gameBoard);
   clearBoard(guessBoard);
   renderBoards(gameBoard, guessBoard);
-  //fbSetNewGame();
   $('#shipSize').text('Current ship length: ' + shipLength);
 });
 

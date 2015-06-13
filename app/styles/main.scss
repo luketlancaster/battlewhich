@@ -1,11 +1,17 @@
 @import '../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap';
 
 * {
-	text-align: center;
+  text-align: center;
 }
 .tableImg{
-	position: relative;
-	top: 850px;
+  position: relative;
+  top: 850px;
+}
+
+tbody,
+tr {
+  width: 500px;
+  height: 500px;
 }
 
 tbody,
@@ -28,9 +34,9 @@ img {
 }
 
 .col-md-2 {
-	margin-top: 25%;
+  margin-top: 25%;
 }
 
 .hidden {
-	display: none;
+  display: none;
 }

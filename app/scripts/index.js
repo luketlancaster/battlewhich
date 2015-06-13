@@ -8,8 +8,8 @@
 //============================================
 //============================================
 
-      var gameBoard = [],
-         guessBoard = gameBoard,
+      var humanBoard = [],
+         computerBoard = [],
            shipsArr = [5,4,3,3,2],
          shipLength = shipsArr[0],
     shipsArrCounter = 0,
@@ -126,23 +126,25 @@ function renderBoards(board1, board2) {
 // checks for valid placement, populates gameArray and rerenders the board.
 //============================================
 
-function placeShip() {
-  if (checkShipPlacement() && checkShipIntersection()) {
-    if (gameBoard[row][col] === 0) {
-      gameBoard[row][col] += 2;
+function placeShip(board) {
+  if (checkShipPlacement() && checkShipIntersection(board)) {
+    if (board[row][col] === 0) {
+      board[row][col] += 2;
       if (isHorizontal) {
-        horizontalFill(shipLength);
+        horizontalFill(shipLength, board);
       } else {
-        vertFill(shipLength);
+        vertFill(shipLength, board);
       }
-      renderBoards(gameBoard, guessBoard);
+      renderBoards(humanBoard, computerBoard);
       shipsArrCounter++;
       shipLength = shipsArr[shipsArrCounter];
       shipValue = shipValueArr[shipsArrCounter];
-      noMoreShips();
+      if (_(humanBoard).flatten().compact().value().length === 17) {
+        noMoreShips();
+      }
+    } else {
+        alert("Please pick another space!");
     }
-  } else {
-    alert("Please pick another space!");
   }
 }
 
@@ -150,19 +152,22 @@ function placeShip() {
 // check if ships intersect with each other.
 //============================================
 
-function checkShipIntersection(){
+function checkShipIntersection(board){
+  if (board === undefined) {
+    clearBoard(board)
+  }
   var placementFootPrint = 0,
       rowForThisFunc     = row,
       colForThisFunc     = col;
 
   if (isHorizontal) {
     for(var i = 0; i < shipLength; i++) {
-      placementFootPrint  += gameBoard[rowForThisFunc][colForThisFunc];
+      placementFootPrint  += board[rowForThisFunc][colForThisFunc];
       colForThisFunc++;
     }
   } else {
     for(var i = 0; i < shipLength; i++) {
-      placementFootPrint  += gameBoard[rowForThisFunc][colForThisFunc]
+      placementFootPrint  += board[rowForThisFunc][colForThisFunc]
         rowForThisFunc++;
     }
   }
@@ -212,13 +217,13 @@ function noMoreShips () {
 // Filling the array  with ships at players chosen location.
 //============================================
 
-function horizontalFill (shipSize) {
-  _.fill(gameBoard[row], shipValue, col, col + shipSize);
+function horizontalFill (shipSize, board) {
+  _.fill(board[row], shipValue, col, col + shipSize);
 }
 
-function vertFill (shipSize) {
+function vertFill (shipSize, board) {
   for(var i = 0; i < shipSize; i++) {
-    _.fill(gameBoard[row], shipValue, col, col + 1);
+    _.fill(board[row], shipValue, col, col + 1);
     row++;
   }
 }
@@ -239,12 +244,12 @@ function vertFill (shipSize) {
 
 function hitDetector(){
   switch(true) {
-    case (guessBoard[row][col] === 0):
-      guessBoard[row][col] += 1;
+    case (computerBoard[row][col] === 0):
+      computerBoard[row][col] += 1;
       $('#hitsOrMisses').text('Miss!');
       break;
-    case (guessBoard[row][col] > 4):
-      guessBoard[row][col] = 3;
+    case (computerBoard[row][col] > 4):
+      computerBoard[row][col] = 3;
       $('#hitsOrMisses').text('You hit a lil\' ship!');
       shipSunkCheck();
       gameOverCheck();
@@ -260,7 +265,7 @@ function hitDetector(){
 //============================================
 
 function shipSunkCheck() {
-  var compactArr = _(gameBoard).flatten().compact().value();
+  var compactArr = _(humanBoard).flatten().compact().value();
   switch(true) {
     case (!_.includes(compactArr, 5) && lastClicked === 5):
       $('#shipSunk').text('Sunk the lil\' sailboat!');
@@ -288,7 +293,7 @@ function shipSunkCheck() {
 //============================================
 
 function gameOverCheck () {
-  var compactArr = _(gameBoard).flatten().compact().value();
+  var compactArr = _(humanBoard).flatten().compact().value();
   if (!_.includes(compactArr, 5) &&
       !_.includes(compactArr, 6) &&
       !_.includes(compactArr, 7) &&
@@ -310,11 +315,47 @@ function gameOverCheck () {
 
 
 $(document).ready(function(){
-  clearBoard(gameBoard);
-  clearBoard(guessBoard);
-  renderBoards(gameBoard, guessBoard);
+  clearBoard(humanBoard);
+  clearBoard(computerBoard);
+  setComputerBoard(computerBoard);
+  renderBoards(humanBoard, computerBoard);
   $('#shipSize').text('Current ship length: ' + shipLength);
 });
+
+//============================================
+// Set up computer board for new game
+//============================================
+
+function setComputerBoard(board) {
+
+  for (var i = 0; i < 5; i++) {
+    // choose either vertical or horizontal
+    chooseDirection()
+    // choose a ship location
+    chooseShipLocation(board)
+  }
+  // reset values for human player turn
+  shipsArrCounter = 0
+  shipValue = shipValueArr[0]
+  shipLength = shipsArr[0]
+}
+
+function chooseDirection() {
+  var horizontal = [true, false]
+  var choice = horizontal[Math.round(Math.random())]
+  isHorizontal = choice
+}
+
+function chooseShipLocation(board) {
+  col = Math.floor(Math.random() * (10 - 0) + 0)
+  row = Math.floor(Math.random() * (10 - 0) + 0)
+
+ while (checkShipIntersection(board) === false || checkShipPlacement() === false) {
+    col = Math.floor(Math.random() * (10 - 0) + 0)
+    row = Math.floor(Math.random() * (10 - 0) + 0)
+ }
+    placeShip(computerBoard)
+}
 
 //============================================
 // Clicks to set peices
@@ -325,7 +366,7 @@ $('.gameWrapper').on('click', 'tbody tr td', function(){
     row = this.parentElement.sectionRowIndex,
     col = this.cellIndex;
     if (shipsArrCounter < 5){
-      placeShip();
+      placeShip(humanBoard);
     }
   }
 });
@@ -334,9 +375,9 @@ $('.guessWrapper').on('click', 'tbody tr td', function(){
   if(isActive) {
     row = this.parentElement.sectionRowIndex,
     col = this.cellIndex;
-    lastClicked = gameBoard[row][col];
+    lastClicked = humanBoard[row][col];
     hitDetector();
-    renderBoards(gameBoard, guessBoard);
+    renderBoards(humanBoard, computerBoard);
   }
 });
 

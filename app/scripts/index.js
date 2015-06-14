@@ -8,56 +8,33 @@
 //============================================
 //============================================
 
-      var humanBoard = [],
-         computerBoard = [],
-           shipsArr = [5,4,3,3,2],
-         shipLength = shipsArr[0],
-    shipsArrCounter = 0,
-       shipValueArr = [9,8,7,6,5],
-          shipValue = shipValueArr[0],
-           isActive = true,
-            missImg = 'http://cdn.flaticon.com/png/256/61072.png',
-             hitImg = 'http://cdn.flaticon.com/png/256/2187.png',
-         twoShipImg = 'http://cdn.flaticon.com/png/256/16489.png',
-       threeShipImg = 'http://cdn.flaticon.com/png/256/62913.png',
-        fourShipImg = 'http://cdn.flaticon.com/png/256/46053.png',
-        fiveShipImg = 'http://cdn.flaticon.com/png/256/45783.png',
+var     humanBoard = [],
+     computerBoard = [],
+          shipsArr = [5,4,3,3,2],
+        shipLength = shipsArr[0],
+  shipsArrCounter  = 0,
+      shipValueArr = [9,8,7,6,5],
+        shipValue  = shipValueArr[0],
+          isActive = true,
+          missImg  = 'http://cdn.flaticon.com/png/256/61072.png',
+            hitImg = 'http://cdn.flaticon.com/png/256/2187.png',
+        twoShipImg = 'http://cdn.flaticon.com/png/256/16489.png',
+      threeShipImg = 'http://cdn.flaticon.com/png/256/62913.png',
+      fourShipImg  = 'http://cdn.flaticon.com/png/256/46053.png',
+      fiveShipImg  = 'http://cdn.flaticon.com/png/256/45783.png',
       isHorizontal,
-      humanBoardNotYetSet = true,
-            gameId,
+humanBoardNotYetSet = true,
        lastClicked,
                row,
                col,
           currGame,
-          isHumanTurn,
-          gameInfo;
+       isHumanTurn;
 
-//============================================
-//============================================
-//============================================
-// Declare functions
-//============================================
-//============================================
-//============================================
 
-// function toggleTurn(turnCounter) {
-//   if (turnCounter % 2 === 1) {
-//     fb.child('players/' + playerId).update({
-//       isTurn: true,
-//       winner: playerId
-//     });
-//   }
-//   fb.child('games/' + gameId).update({
-//     player1Turn: ,
-//     winner: playerId
-//   });
-// }
-
-//============================================
 //============================================
 // GAME SETUP FUNCTIONS
 //============================================
-//============================================
+
 
 //============================================
 // creates an empty 2d arry 10 x 10.
@@ -148,7 +125,7 @@ function placeShip(board) {
     }
     } else {
       if (isHumanTurn) {
-        alert("Please pick another space!");
+        $('#infoBoard').text("You already guessed there, try again!");
       }
   }
 }
@@ -249,11 +226,11 @@ function hitDetector(){
     switch(true) {
       case (computerBoard[row][col] === 0):
         computerBoard[row][col] += 1;
-      $('#hitsOrMisses').text('Miss!');
+      $('#hitsOrMisses').text('You missed!').css('color', 'black');
       break;
       case (computerBoard[row][col] > 4):
         computerBoard[row][col] = 3;
-      $('#hitsOrMisses').text('You hit a lil\' ship!');
+      $('#hitsOrMisses').text('You hit a lil\' ship!').css('color', 'red');
       shipSunkCheck();
       gameOverCheck();
       break;
@@ -265,11 +242,11 @@ function hitDetector(){
     switch(true) {
       case (humanBoard[row][col] === 0):
         humanBoard[row][col] += 1;
-      $('#hitsOrMisses').text('Miss!');
+      $('#computerHits').text('Computer missed!').css('color', 'black');
       break;
       case (humanBoard[row][col] > 4):
         humanBoard[row][col] = 3;
-      $('#hitsOrMisses').text('Computer hit a lil\' ship!');
+      $('#computerHits').text('Computer hit a lil\' ship!').css('color', 'red');
       shipSunkCheck();
       gameOverCheck();
       break;
@@ -316,20 +293,20 @@ function gameOverCheck () {
   var compactArr = _(humanBoard).flatten().compact().value();
   if (!_.includes(compactArr, 5) &&
       !_.includes(compactArr, 6) &&
-        !_.includes(compactArr, 7) &&
-          !_.includes(compactArr, 8) &&
-            !_.includes(compactArr, 9)) {
-    $('#infoBoard').text('The computer sunk all the lil\' ships! You suck!');
-  isActive = false
+      !_.includes(compactArr, 7) &&
+      !_.includes(compactArr, 8) &&
+      !_.includes(compactArr, 9)) {
+    $('#infoBoard').text('The computer sunk all the lil\' ships! Bummer!');
+  isActive = false;
   }
   var computerArr = _(computerBoard).flatten().compact().value();
   if (!_.includes(computerArr, 5) &&
       !_.includes(computerArr, 6) &&
-        !_.includes(computerArr, 7) &&
-          !_.includes(computerArr, 8) &&
-            !_.includes(computerArr, 9)) {
-    $('#infoBoard').text('You sunk all the computer\'s lil\' ships! You won!');
-  isActive = false
+      !_.includes(computerArr, 7) &&
+      !_.includes(computerArr, 8) &&
+      !_.includes(computerArr, 9)) {
+    $('#infoBoard').text('You sunk all the computer\'s lil\' ships! Oh yeah!');
+  isActive = false;
   }
 }
 
@@ -362,47 +339,41 @@ function setComputerBoard(board) {
 
   for (var i = 0; i < 5; i++) {
     // choose either vertical or horizontal
-    chooseDirection()
+    isHorizontal = _.sample(true, false);
     // choose a ship location
-    chooseShipLocation(board)
+    chooseShipLocation(board);
   }
   // reset values for human player turn
-  shipsArrCounter = 0
-  shipValue = shipValueArr[0]
-  shipLength = shipsArr[0]
-  isHumanTurn = true
-}
-
-function chooseDirection() {
-  var horizontal = [true, false]
-  var choice = horizontal[Math.round(Math.random())]
-  isHorizontal = choice
+  shipsArrCounter = 0;
+  shipValue = shipValueArr[0];
+  shipLength = shipsArr[0];
+  isHumanTurn = true;
 }
 
 function chooseShipLocation(board) {
-  col = Math.floor(Math.random() * (10 - 0) + 0)
-  row = Math.floor(Math.random() * (10 - 0) + 0)
+  col = _.random(0,9);
+  row = _.random(0,9);
 
   while (_(computerBoard).flatten().compact().sort().value().length !== 17) {
-    col = Math.floor(Math.random() * (10 - 0) + 0)
-    row = Math.floor(Math.random() * (10 - 0) + 0)
-    placeShip(computerBoard)
+    col = _.random(0,9);
+    row = _.random(0,9);
+    placeShip(computerBoard);
   }
 }
 
 function computerMove() {
-  col = Math.floor(Math.random() * (10 - 0) + 0)
-  row = Math.floor(Math.random() * (10 - 0) + 0)
+  col = _.random(0,9);
+  row = _.random(0,9);
 
   while (humanBoard[row][col] === 1 || humanBoard[row][col] === 3) {
-    col = Math.floor(Math.random() * (10 - 0) + 0)
-    row = Math.floor(Math.random() * (10 - 0) + 0)
-    console.log('computer looking')
+    col = _.random(0,9);
+    row = _.random(0,9);
+    console.log('computer looking');
   }
   if (humanBoard[row][col] !== 1 && humanBoard[row][col] !== 3) {
-    hitDetector()
+    hitDetector();
     renderBoards(humanBoard, computerBoard);
-    isHumanTurn = true
+    isHumanTurn = true;
   }
 }
 
@@ -412,21 +383,21 @@ function computerMove() {
 
 $('.gameWrapper').on('click', 'tbody tr td', function(){
   if(isActive && humanBoardNotYetSet) {
-    row = this.parentElement.sectionRowIndex,
+    row = this.parentElement.sectionRowIndex;
     col = this.cellIndex;
     if (shipsArrCounter < 5){
       placeShip(humanBoard);
     } else {
-      humanBoardNotYetSet = false
+      humanBoardNotYetSet = false;
     }
   }
 });
 
 $('.guessWrapper').on('click', 'tbody tr td', function(){
   if(isActive && isHumanTurn) {
-    row = this.parentElement.sectionRowIndex,
+    row = this.parentElement.sectionRowIndex;
     col = this.cellIndex;
-    checkInput(row,col)
+    checkInput(row,col);
     renderBoards(humanBoard, computerBoard);
   }
 });
@@ -434,12 +405,12 @@ $('.guessWrapper').on('click', 'tbody tr td', function(){
 function checkInput(row,col) {
     lastClicked = computerBoard[row][col];
     if (lastClicked === 1 || lastClicked === 3) {
-      isHumanTurn = true
-      alert('Choose again!')
+      isHumanTurn = true;
+      $('#infoBoard').text("Please pick another space!");
     } else {
       hitDetector();
-      isHumanTurn = false
-      computerMove()
+      isHumanTurn = false;
+      computerMove();
   }
 }
 

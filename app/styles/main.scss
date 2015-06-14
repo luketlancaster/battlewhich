@@ -16,17 +16,8 @@ tr {
 
 tbody,
 tr {
-	width: 500px;
-	height: 500px;
-}
-
-tbody,
-tr,
-td {
-  width: 40px;
-  height: 40px;
-  border: ridge;
-  background-color: #3f9cdd;
+  width: 500px;
+  height: 500px;
 }
 
 img {
@@ -39,4 +30,13 @@ img {
 
 .hidden {
   display: none;
+}
+
+tbody,
+tr,
+td {
+  width: 40px;
+  height: 40px;
+  border: ridge;
+  background-color: #3f9cdd;
 }
